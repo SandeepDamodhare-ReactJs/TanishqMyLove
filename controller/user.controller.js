@@ -137,13 +137,15 @@ const userGet = async (req, res) => {
 
 
 
-
-
 const userSuggestion = async (req, res) => {
     try {
-        const { query } = req; 
+        const { query } = req.query;
 
-       
+        if (!query) {
+            return res.status(400).json({ message: 'Query parameter is required' });
+        }
+
+        // Construct the search condition
         const searchCondition = {
             $or: [
                 { name: { $regex: query, $options: 'i' } },
@@ -152,17 +154,16 @@ const userSuggestion = async (req, res) => {
             ]
         };
 
-        
+        // Perform the search
         const users = await UserModel.find(searchCondition).limit(10).select('name -_id');
         const suggestions = users.map(user => user.name);
 
         res.json({ suggestions });
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Error in userSuggestion:', error.message);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
 
 
 
