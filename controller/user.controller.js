@@ -261,11 +261,11 @@ const userGet = async (req, res) => {
 
         // Build query based on provided parameters
         const query = {};
-        if (name) {
-            query.name = new RegExp('^' + name + '$', 'i');
-        }
         if (pincode) {
-            query.pincode = pincode;
+            query.pincode = new RegExp('^' + pincode + '$', 'i');
+        }
+        if (name) {
+            query.name = name;
         }
 
         const user = await UserModel.findOne(query);
@@ -284,13 +284,12 @@ const userSuggestion = async (req, res) => {
     try {
         const { name, pincode } = req.query;
 
-        // Build query based on provided parameters
         const query = {};
-        if (name) {
-            query.name = { $regex: name, $options: 'i' };
-        }
         if (pincode) {
-            query.pincode = pincode;
+            query.pincode = { $regex: pincode, $options: 'i' };
+        }
+        if (name) {
+            query.name = name;
         }
 
         const users = await UserModel.find(query).limit(10).select('name -_id');
