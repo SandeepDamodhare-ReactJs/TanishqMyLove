@@ -148,11 +148,6 @@
 
 
 
-
-
-
-
-
 const { UserModel } = require("../model/user.model");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -262,9 +257,18 @@ const userDelete = async (req, res) => {
 
 const userGet = async (req, res) => {
     try {
-        const { name } = req.query;
+        const { name, pincode } = req.query;
 
-        const user = await UserModel.findOne({ name: new RegExp('^' + name + '$', 'i') });
+        // Build query based on provided parameters
+        const query = {};
+        if (name) {
+            query.name = new RegExp('^' + name + '$', 'i');
+        }
+        if (pincode) {
+            query.pincode = pincode;
+        }
+
+        const user = await UserModel.findOne(query);
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -278,9 +282,20 @@ const userGet = async (req, res) => {
 
 const userSuggestion = async (req, res) => {
     try {
-        const { name } = req.query;
-        const users = await UserModel.find({ name: { $regex: name, $options: 'i' } }).limit(10).select('name address pincode -_id');
-        res.json({ suggestions: users });
+        const { name, pincode } = req.query;
+
+        // Build query based on provided parameters
+        const query = {};
+        if (name) {
+            query.name = { $regex: name, $options: 'i' };
+        }
+        if (pincode) {
+            query.pincode = pincode;
+        }
+
+        const users = await UserModel.find(query).limit(10).select('name -_id');
+        const suggestions = users.map(user => user.name);
+        res.json({ suggestions });
     } catch (error) {
         res.status(500).send(error);
     }
