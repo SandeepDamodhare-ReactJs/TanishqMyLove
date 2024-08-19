@@ -20,3 +20,5 @@ const UserModel = mongoose.model("UserProfile", userSchema);
 module.exports = {
   UserModel
 };
+
+
