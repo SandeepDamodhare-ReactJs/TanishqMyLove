@@ -74,12 +74,12 @@ const userUpdate = async (req, res) => {
     const userData = req.body;
     const { UserId } = req.params;
     console.log("UserId", UserId);
-    let newData = {...userData, }
+    let newData = { ...userData, }
     try {
         const prevImage = await UserModel.findOne({ _id: UserId })
         console.log("prev", prevImage);
         console.log("data", userData);
-        
+
         await UserModel.findByIdAndUpdate({ _id: UserId }, userData);
         res.status(200).json({ msg: "User update success!", success: true });
     } catch (error) {
@@ -106,95 +106,32 @@ const userDelete = async (req, res) => {
     }
 };
 
-// const userGet = async (req, res) => {
-//     try {
-//         const { name } = req.query;
-
-//         const user = await UserModel.findOne({ name: new RegExp('^' + name + '$', 'i') });
-
-//         if (!user) {
-//             return res.status(404).json({ message: "User not found" });
-//         }
-
-//         res.status(200).json({ message: "User found successfully", user });
-//     } catch (error) {
-//         res.status(500).json({ message: "An error occurred", error: error.message });
-//     }
-// };
-
-
 const userGet = async (req, res) => {
     try {
-        const { name, pincode, address } = req.query;
+        const { name } = req.query;
 
-        // Build query object based on provided parameters
-        const query = {};
-        if (name) query.name = new RegExp(name, 'i'); // Case-insensitive search
-        if (pincode) query.pincode = pincode;
-        if (address) query.address = new RegExp(address, 'i'); // Case-insensitive search
+        const user = await UserModel.findOne({ name: new RegExp('^' + name + '$', 'i') });
 
-        console.log("Query Object:", query); // Log query for debugging
-
-        // Find users matching the query
-        const users = await UserModel.find(query);
-        console.log("Users Found:", users); // Log users for debugging
-
-        if (users.length === 0) {
-            return res.status(404).json({ message: "No users found" });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
 
-        res.status(200).json({ message: "Users found successfully", users });
+        res.status(200).json({ message: "User found successfully", user });
     } catch (error) {
-        console.error("Error:", error); // Log error for debugging
         res.status(500).json({ message: "An error occurred", error: error.message });
     }
 };
 
-
-
-
-
-
-
-
-// const userSuggestion = async (req, res) => {
-//     try {
-//         const { name } = req.query;
-//         const users = await UserModel.find({ name: { $regex: name, $options: 'i' } }).limit(10).select('name -_id');
-//         const suggestions = users.map(user => user.name);
-//         res.json({ suggestions });
-//     } catch (error) {
-//         res.status(500).send(error);
-//     }
-// };
-
 const userSuggestion = async (req, res) => {
     try {
-        const { name, pincode, address } = req.query;
-
-        // Build query object based on provided parameters
-        const query = {};
-        if (name) query.name = { $regex: name, $options: 'i' }; // Case-insensitive search
-        if (pincode) query.pincode = pincode;
-        if (address) query.address = { $regex: address, $options: 'i' }; // Case-insensitive search
-
-        console.log("Query Object:", query); // Log query for debugging
-
-        // Find users matching the query
-        const users = await UserModel.find(query).limit(10).select('name -_id');
-        console.log("Suggestions Found:", users); // Log suggestions for debugging
-
+        const { name } = req.query;
+        const users = await UserModel.find({ name: { $regex: name, $options: 'i' } }).limit(10).select('name -_id');
         const suggestions = users.map(user => user.name);
         res.json({ suggestions });
     } catch (error) {
-        console.error("Error:", error); // Log error for debugging
         res.status(500).send(error);
     }
 };
-
-
-
-
 
 module.exports = {
     getUserData,
@@ -205,7 +142,3 @@ module.exports = {
     userSuggestion,
     userGet
 };
-
-
-
-
