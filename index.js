@@ -4,6 +4,7 @@ const cors = require("cors");
 const { connection } = require("./config/db");
 const { UserRouter } = require("./routes/user.routes");
 const { AlbumRouter } = require("./routes/album.routes");
+const { VideoRouter } = require("./routes/video.routes");
 require("dotenv").config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/user", UserRouter);
 app.use("/album", AlbumRouter);
+app.use("/video", VideoRouter);
 
 let port = process.env.PORT || 8080;
 
